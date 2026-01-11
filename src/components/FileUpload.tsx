@@ -123,10 +123,10 @@ export default function FileUpload({ mode, onFileSelect, isDisabled }: FileUploa
         {!selectedFile ? (
           <motion.div
             key="dropzone"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.18 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className={`
               dropzone relative rounded-xl p-8 sm:p-12
               text-center cursor-pointer
@@ -140,16 +140,13 @@ export default function FileUpload({ mode, onFileSelect, isDisabled }: FileUploa
             onClick={isDisabled ? undefined : handleClick}
           >
             <div className="relative z-10 w-full max-w-xl mx-auto">
-              <motion.div
-                className="mb-6"
-                animate={isDragging ? { scale: 1.06, y: -4 } : { scale: 1, y: 0 }}
-              >
+              <div className="mb-6">
                 {mode === 'image' ? (
                   <Image className="w-16 h-16 mx-auto text-neon-blue opacity-70" strokeWidth={1} />
                 ) : (
                   <Video className="w-16 h-16 mx-auto text-neon-blue opacity-70" strokeWidth={1} />
                 )}
-              </motion.div>
+              </div>
 
               <h3 className="font-display text-lg sm:text-xl mb-2 text-white tracking-wide">
                 {isDragging ? 'Pusťte soubor zde' : `Nahrajte ${mode === 'image' ? 'obrázek' : 'video'}`}
@@ -172,9 +169,10 @@ export default function FileUpload({ mode, onFileSelect, isDisabled }: FileUploa
         ) : (
           <motion.div
             key="preview"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className="cyber-card p-4 sm:p-5"
           >
             <div className="flex items-start gap-4">

@@ -4,10 +4,6 @@ import {
   Shield, ShieldAlert, AlertTriangle, Film, Clock, 
   BarChart3, Eye, ChevronLeft, ChevronRight, Info 
 } from 'lucide-react';
-import { 
-  AreaChart, Area, XAxis, YAxis, Tooltip, 
-  ResponsiveContainer, ReferenceLine 
-} from 'recharts';
 import { VideoAnalysisResponse } from '@/types';
 import { formatPercentage, formatDuration, getConfidenceLevel } from '@/lib/api';
 
@@ -47,13 +43,6 @@ export default function VideoResultDisplay({ result }: VideoResultDisplayProps) 
 
   const isFake = is_deepfake;
   const keyFrames = result.key_frames || [];
-  const timeline = result.timeline;
-
-  const chartData = timeline ? timeline.indices.map((idx, i) => ({
-    frame: idx,
-    time: timeline.timestamps[i],
-    probability: timeline.probabilities[i],
-  })) : [];
 
   const nextKeyFrame = () => {
     setCurrentKeyFrame((prev) => (prev + 1) % keyFrames.length);
@@ -146,80 +135,6 @@ export default function VideoResultDisplay({ result }: VideoResultDisplayProps) 
           />
         </div>
       </div>
-
-      {/* Timeline chart */}
-      {chartData.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="cyber-card p-6"
-        >
-          <div className="flex items-center gap-2 mb-6 text-gray-400">
-            <BarChart3 className="w-4 h-4" />
-            <span className="text-sm font-display">ČASOVÁ OSA ANALÝZY</span>
-          </div>
-
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="probabilityGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={isFake ? '#ff3366' : '#00ff88'} stopOpacity={0.3} />
-                    <stop offset="100%" stopColor={isFake ? '#ff3366' : '#00ff88'} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="frame" 
-                  stroke="#4a4a5a"
-                  tick={{ fill: '#8a8a9a', fontSize: 12 }}
-                  axisLine={{ stroke: '#2a2a3a' }}
-                />
-                <YAxis 
-                  domain={[0, 1]}
-                  stroke="#4a4a5a"
-                  tick={{ fill: '#8a8a9a', fontSize: 12 }}
-                  axisLine={{ stroke: '#2a2a3a' }}
-                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#12121a', 
-                    border: '1px solid #00d4ff',
-                    borderRadius: '8px',
-                    color: '#e0e0e0'
-                  }}
-                  formatter={(value: number) => [`${(value * 100).toFixed(1)}%`, 'Pravděpodobnost']}
-                  labelFormatter={(label) => `Frame ${label}`}
-                />
-                <ReferenceLine 
-                  y={0.5} 
-                  stroke="#ffd60a" 
-                  strokeDasharray="5 5" 
-                />
-                <Area
-                  type="monotone"
-                  dataKey="probability"
-                  stroke={isFake ? '#ff3366' : '#00ff88'}
-                  strokeWidth={2}
-                  fill="url(#probabilityGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-neon-yellow" />
-              Práh detekce (50%)
-            </span>
-            <span className="flex items-center gap-1">
-              <div className={`w-3 h-0.5 ${isFake ? 'bg-neon-red' : 'bg-neon-green'}`} />
-              Pravděpodobnost deepfake
-            </span>
-          </div>
-        </motion.div>
-      )}
 
       {/* Key frames gallery */}
       {keyFrames.length > 0 && (
@@ -329,9 +244,10 @@ export default function VideoResultDisplay({ result }: VideoResultDisplayProps) 
           <Info className="w-5 h-5 text-neon-blue flex-shrink-0 mt-0.5" />
           <div className="text-sm text-gray-400">
             <p>
-              Video bylo analyzováno po jednotlivých snímcích. Model detekoval a analyzoval 
-              obličeje v {frames_analyzed} snímcích z celkových {total_frames}. Výsledná 
-              pravděpodobnost deepfake je průměrem všech analyzovaných snímků. 
+              Video bylo analyzováno po jednotlivých snímcích pomocí MTCNN pro detekci obličejů 
+              a Hugging Face modelů pro klasifikaci. Analyzováno {frames_analyzed} snímků 
+              z celkových {total_frames}. Výsledná pravděpodobnost je agregována pomocí 
+              robustní metody (max, top-k průměr, percentil). 
               Směrodatná odchylka {formatPercentage(std_deviation)} indikuje 
               {std_deviation < 0.1 ? ' konzistentní ' : std_deviation < 0.2 ? ' mírně variabilní ' : ' vysoce variabilní '}
               výsledky napříč snímky.

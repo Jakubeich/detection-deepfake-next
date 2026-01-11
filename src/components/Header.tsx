@@ -17,17 +17,13 @@ export default function Header() {
       <div className="relative max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <motion.div
-              className="relative"
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            >
+            <div className="relative">
               <div
                 className="absolute inset-0 rounded-full"
                 style={{ background: 'rgba(0,212,255,0.18)', filter: 'blur(14px)' }}
               />
               <Shield className="w-12 h-12 text-neon-blue relative z-10" strokeWidth={1.5} />
-            </motion.div>
+            </div>
 
             <div>
               <h1 className="font-display text-2xl md:text-3xl font-bold tracking-wider">
@@ -35,9 +31,6 @@ export default function Header() {
                 <span className="neon-text-blue">FAKE</span>
                 <span className="text-gray-400 ml-2">DETECTOR</span>
               </h1>
-              <p className="text-xs text-gray-500 tracking-widest uppercase mt-1">
-                AI-Powered Media Analysis
-              </p>
             </div>
           </div>
 

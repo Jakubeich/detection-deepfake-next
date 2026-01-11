@@ -67,83 +67,22 @@ body {
   font-family: 'JetBrains Mono', 'Courier New', monospace !important;
 }
 
-/* Neon glow text effects */
+/* Subtle text glow effects - removed excessive neon */
 .neon-text-red {
   color: var(--color-neon-red) !important;
-  text-shadow:
-    0 0 5px var(--color-neon-red),
-    0 0 10px var(--color-neon-red),
-    0 0 20px var(--color-neon-red),
-    0 0 40px var(--color-neon-red);
 }
 
 .neon-text-green {
   color: var(--color-neon-green) !important;
-  text-shadow:
-    0 0 5px var(--color-neon-green),
-    0 0 10px var(--color-neon-green),
-    0 0 20px var(--color-neon-green),
-    0 0 40px var(--color-neon-green);
 }
 
 .neon-text-blue {
   color: var(--color-neon-blue) !important;
-  text-shadow:
-    0 0 5px var(--color-neon-blue),
-    0 0 10px var(--color-neon-blue),
-    0 0 20px var(--color-neon-blue);
 }
 
-/* Scanning line effect */
-.scan-line {
-  position: relative;
-  overflow: hidden;
-}
+/* Removed scanning line effect */
 
-.scan-line::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(0, 212, 255, 0.35),
-    transparent
-  );
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: -10%; }
-  100% { top: 110%; }
-}
-
-/* Progress bar glow */
-.progress-glow {
-  position: relative;
-  overflow: hidden;
-}
-
-.progress-glow::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.16),
-    transparent
-  );
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
+/* Removed progress bar glow effect */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -173,11 +112,8 @@ body {
 
 .dropzone:hover,
 .dropzone.active {
-  border-color: rgba(0, 212, 255, 0.75) !important;
-  background: rgba(0, 212, 255, 0.05) !important;
-  box-shadow:
-    0 0 18px rgba(0, 212, 255, 0.10),
-    inset 0 0 18px rgba(0, 212, 255, 0.05);
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  background: rgba(0, 212, 255, 0.03) !important;
 }
 
 /* Cyber button styles */
@@ -198,32 +134,9 @@ body {
   transition: all 0.25s ease;
 }
 
-.cyber-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 120%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(0, 212, 255, 0.18),
-    transparent
-  );
-  transition: left 0.5s ease;
-}
-
-.cyber-button:hover::before {
-  left: 120%;
-}
-
 .cyber-button:hover {
-  box-shadow:
-    0 0 10px rgba(0, 212, 255, 0.55),
-    0 0 22px rgba(0, 212, 255, 0.22),
-    inset 0 0 10px rgba(0, 212, 255, 0.08);
-  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.75) !important;
+  background: linear-gradient(135deg, rgba(18,18,26,0.95) 0%, rgba(26,26,36,0.95) 100%) !important;
 }
 
 .cyber-button:active {
@@ -261,19 +174,7 @@ body {
   border-color: var(--color-neon-green) !important;
 }
 
-/* Pulse animation for results */
-@keyframes result-pulse {
-  0%, 100% {
-    box-shadow: 0 0 6px var(--glow-color);
-  }
-  50% {
-    box-shadow: 0 0 18px var(--glow-color), 0 0 36px var(--glow-color);
-  }
-}
-
-.result-pulse {
-  animation: result-pulse 2s ease-in-out infinite;
-}
+/* Removed pulse animation for results */
 
 /* Mode selector active state (optional helper) */
 .mode-active {

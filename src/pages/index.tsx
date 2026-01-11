@@ -230,25 +230,25 @@ export default function Home() {
               <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-400 leading-relaxed">
                 <div className="space-y-2">
                   <h4 className="text-neon-blue font-display">Technologie</h4>
-                  <p>
-                    Model využívá konvoluční neuronovou síť ResNet18 s transfer
-                    learningem pro detekci manipulovaných obličejů.
+                  <p className="break-words">
+                    Aplikace využívá předtrénované modely z Hugging Face (dima806/deepfake_vs_real_image_detection, 
+                    Wvolf/ViT_Deepfake_Detection) s ensemble votingem pro vyšší přesnost.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h4 className="text-neon-blue font-display">Jak to funguje</h4>
                   <p>
-                    Systém detekuje obličeje pomocí MTCNN, extrahuje features a
-                    klasifikuje je jako reálné nebo deepfake.
+                    Systém detekuje obličeje pomocí MTCNN, analyzuje je pomocí více modelů 
+                    a kombinuje výsledky pro finální predikci.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h4 className="text-neon-blue font-display">Limitace</h4>
                   <p>
-                    Model je trénován na omezeném datasetu. Přesnost závisí na
-                    kvalitě vstupu a typu deepfake technologie.
+                    Modely jsou trénované na FaceForensics++ a dalších datasetech. 
+                    Přesnost závisí na kvalitě vstupu a typu deepfake technologie.
                   </p>
                 </div>
               </div>
@@ -261,7 +261,7 @@ export default function Home() {
               transition={{ delay: 0.55 }}
               className="text-center text-gray-500 text-sm"
             >
-              <p>Semestrální projekt • Umělá inteligence • 2024</p>
+              <p>Semestrální projekt • Umělá inteligence • 2026</p>
             </motion.footer>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { ImageAnalysisResponse, VideoAnalysisResponse, HealthCheckResponse } from '@/types';
 
-const API_BASE = 'http://127.0.0.1:5000/api';
+const API_BASE = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`;
 
 export async function checkHealth(): Promise<HealthCheckResponse> {
   const response = await fetch(`${API_BASE}/health`);

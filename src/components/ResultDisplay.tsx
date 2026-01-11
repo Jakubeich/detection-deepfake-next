@@ -38,36 +38,25 @@ export default function ResultDisplay({ result }: ResultDisplayProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
       className="space-y-6"
     >
       {/* Main result card */}
       <div 
-        className={`cyber-card p-6 result-pulse ${isFake ? 'result-fake' : 'result-real'}`}
+        className={`cyber-card p-6 ${isFake ? 'result-fake' : 'result-real'}`}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             {isFake ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-              >
-                <ShieldAlert className="w-12 h-12 text-neon-red" strokeWidth={1.5} />
-              </motion.div>
+              <ShieldAlert className="w-12 h-12 text-neon-red" strokeWidth={1.5} />
             ) : (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-              >
-                <Shield className="w-12 h-12 text-neon-green" strokeWidth={1.5} />
-              </motion.div>
+              <Shield className="w-12 h-12 text-neon-green" strokeWidth={1.5} />
             )}
             
             <div>
-              <h2 className={`font-display text-2xl font-bold ${isFake ? 'neon-text-red' : 'neon-text-green'}`}>
+              <h2 className={`font-display text-2xl font-bold ${isFake ? 'text-neon-red' : 'text-neon-green'}`}>
                 {isFake ? 'DEEPFAKE DETEKOVÁN' : 'OBSAH JE AUTENTICKÝ'}
               </h2>
               <p className="text-gray-400 text-sm mt-1">
@@ -97,9 +86,9 @@ export default function ResultDisplay({ result }: ResultDisplayProps) {
       {/* Visualization */}
       {result.visualization && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
           className="cyber-card p-4"
         >
           <div className="flex items-center gap-2 mb-4 text-gray-400">
@@ -113,9 +102,6 @@ export default function ResultDisplay({ result }: ResultDisplayProps) {
               alt="Analysis visualization" 
               className="w-full"
             />
-            
-            {/* Scan line effect */}
-            <div className="absolute inset-0 scan-line pointer-events-none" />
           </div>
         </motion.div>
       )}
@@ -131,9 +117,9 @@ export default function ResultDisplay({ result }: ResultDisplayProps) {
           <Info className="w-5 h-5 text-neon-blue flex-shrink-0 mt-0.5" />
           <div className="text-sm text-gray-400">
             <p>
-              Model analyzoval obličej na obrázku pomocí konvoluční neuronové sítě 
-              (ResNet18 s transfer learningem). Výsledek ukazuje pravděpodobnost, 
-              že obsah byl manipulován pomocí technologií deepfake.
+              Obličej byl analyzován pomocí předtrénovaných modelů z Hugging Face. 
+              Systém používá ensemble více modelů pro vyšší přesnost. 
+              Výsledek ukazuje pravděpodobnost, že obsah byl manipulován pomocí technologií deepfake.
             </p>
           </div>
         </div>
@@ -185,11 +171,11 @@ function ProbabilityBar({ label, value, color, isHighlighted }: ProbabilityBarPr
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value * 100}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="h-full rounded-full progress-glow"
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="h-full rounded-full"
           style={{ 
             background: getBarColor(),
-            boxShadow: isHighlighted ? `0 0 10px ${getBarColor()}` : 'none'
+            boxShadow: isHighlighted ? `0 0 6px ${getBarColor()}` : 'none'
           }}
         />
       </div>
