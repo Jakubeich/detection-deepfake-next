@@ -1,7 +1,17 @@
 import { Shield, Cpu, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { StatusIndicator, StatusType } from './ui';
 
-export default function Header() {
+export interface HealthStatus {
+  model: StatusType;
+  system: StatusType;
+}
+
+interface HeaderProps {
+  health?: HealthStatus;
+}
+
+export default function Header({ health }: HeaderProps) {
   return (
     <motion.header
       className="relative pt-10 pb-8 px-4 sm:px-6"
@@ -35,8 +45,16 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-6">
-            <StatusIndicator icon={<Cpu className="w-4 h-4" />} label="Model" status="active" />
-            <StatusIndicator icon={<Activity className="w-4 h-4" />} label="System" status="active" />
+            <StatusIndicator
+              icon={<Cpu className="w-4 h-4" />}
+              label="Model"
+              status={health?.model ?? 'inactive'}
+            />
+            <StatusIndicator
+              icon={<Activity className="w-4 h-4" />}
+              label="System"
+              status={health?.system ?? 'inactive'}
+            />
           </div>
         </div>
 
@@ -49,47 +67,5 @@ export default function Header() {
         />
       </div>
     </motion.header>
-  );
-}
-
-interface StatusIndicatorProps {
-  icon: React.ReactNode;
-  label: string;
-  status: 'active' | 'inactive' | 'loading';
-}
-
-function StatusIndicator({ icon, label, status }: StatusIndicatorProps) {
-  const getStatusColor = () => {
-    switch (status) {
-      case 'active':
-        return 'text-neon-green';
-      case 'loading':
-        return 'text-neon-yellow';
-      default:
-        return 'text-gray-500';
-    }
-  };
-
-  const getBgColor = () => {
-    switch (status) {
-      case 'active':
-        return 'bg-neon-green';
-      case 'loading':
-        return 'bg-neon-yellow';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className={getStatusColor()}>{icon}</span>
-      <span className="text-gray-400">{label}</span>
-      <motion.div
-        className={`w-2 h-2 rounded-full ${getBgColor()}`}
-        animate={status === 'active' ? { scale: [1, 1.2, 1] } : {}}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-    </div>
   );
 }

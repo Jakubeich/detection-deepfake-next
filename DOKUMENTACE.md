@@ -32,14 +32,22 @@ detection-deepfake-next/
 ├── public/                    # Statické soubory
 ├── src/
 │   ├── components/           # React komponenty
+│   │   ├── ui/               # Sdílené UI komponenty
+│   │   │   ├── ModeButton.tsx
+│   │   │   ├── ProbabilityBar.tsx
+│   │   │   ├── StatCard.tsx
+│   │   │   ├── StatusIndicator.tsx
+│   │   │   └── index.ts
 │   │   ├── FileUpload.tsx
 │   │   ├── Header.tsx
 │   │   ├── LoadingAnimation.tsx
 │   │   ├── ModeSelector.tsx
 │   │   ├── ResultDisplay.tsx
-│   │   └── VideoResultDisplay.tsx
-│   ├── lib/                  # Utility funkce
-│   │   └── api.ts
+│   │   ├── VideoResultDisplay.tsx
+│   │   └── index.ts          # Export všech komponent
+│   ├── lib/                  # API a utility funkce
+│   │   ├── api.ts            # API volání
+│   │   └── utils.ts          # Formátovací utility
 │   ├── pages/                # Next.js stránky
 │   │   ├── _app.tsx
 │   │   ├── _document.tsx
@@ -61,15 +69,25 @@ detection-deepfake-next/
 
 **Účel**: Hlavička aplikace s logem a informacemi o stavu systému
 
+**Props**:
+```typescript
+{
+  health?: HealthStatus  // Stav z getServerSideProps
+}
+```
+
 **Vlastnosti**:
 - Logo s cyber-themed designem
-- Status indikátory pro Model a System
+- Status indikátory pro Model a System (napojeno na `/api/health`)
 - Responzivní layout
+- Server-side rendering pro stav backendu
 
 **Technické detaily**:
 - Používá Framer Motion pro fade-in animace
 - Ikony z Lucide React (Shield, Cpu, Activity)
 - Gradient efekty pro vizuální styl
+- Status se načítá na serveru přes `getServerSideProps` (bez zatěžování klienta)
+- Používá sdílenou komponentu `StatusIndicator` z `components/ui`
 
 ### 2. ModeSelector (`ModeSelector.tsx`)
 
@@ -88,6 +106,7 @@ detection-deepfake-next/
 - Toggle mezi Image a Video módem
 - Vizuální feedback aktivního režimu
 - Disable stav během analýzy
+- Používá sdílenou komponentu `ModeButton` z `components/ui`
 
 ### 3. FileUpload (`FileUpload.tsx`)
 
@@ -143,7 +162,7 @@ detection-deepfake-next/
 
 **Zobrazované informace**:
 - Hlavní verdikt (DEEPFAKE/AUTENTICKÝ)
-- Pravděpodobnost fake/real (progress bary)
+- Pravděpodobnost fake/real (sdílená komponenta `ProbabilityBar`)
 - Úroveň spolehlivosti
 - Vizualizace s bounding boxem
 - Technická informace o analýze
@@ -168,52 +187,96 @@ detection-deepfake-next/
 
 1. **Hlavní výsledková karta**
    - Verdikt s ikonou
-   - Grid statistik (Deepfake %, Framů, Délka, Odchylka)
-   - Progress bary pro průměrné pravděpodobnosti
+   - Grid statistik (sdílená komponenta `StatCard`)
+   - Progress bary pro průměrné pravděpodobnosti (sdílená komponenta `ProbabilityBar`)
 
-2. **Timeline graf**
-   - Recharts area chart
-   - Zobrazení pravděpodobnosti deepfake v čase
-   - Reference line na 50% prahu
-   - Interactive tooltip
-
-3. **Klíčové snímky galerie**
+2. **Klíčové snímky galerie**
    - Carousel klíčových framů s anotacemi
    - Thumbnail strip pro rychlou navigaci
    - Overlay s frame číslem a pravděpodobností
 
-4. **Info karta**
+3. **Info karta**
    - Technické informace o analýze
    - Popis metody agregace
    - Interpretace směrodatné odchylky
+
+### 7. Sdílené UI komponenty (`components/ui/`)
+
+Ve složce `components/ui/` jsou umístěny znovupoužitelné UI komponenty:
+
+#### StatusIndicator (`ui/StatusIndicator.tsx`)
+**Účel**: Indikátor stavu s ikonou a animovaným bodem
+```typescript
+{
+  icon: React.ReactNode,
+  label: string,
+  status: 'active' | 'inactive'
+}
+```
+
+#### ModeButton (`ui/ModeButton.tsx`)
+**Účel**: Tlačítko pro přepínač módu s aktivním stavem
+```typescript
+{
+  icon: React.ReactNode,
+  label: string,
+  isActive: boolean,
+  onClick: () => void,
+  disabled?: boolean
+}
+```
+
+#### ProbabilityBar (`ui/ProbabilityBar.tsx`)
+**Účel**: Animovaný progress bar pro zobrazení pravděpodobnosti
+```typescript
+{
+  label: string,
+  value: number,           // 0.0 - 1.0
+  color: 'red' | 'green' | 'blue',
+  isHighlighted?: boolean
+}
+```
+
+#### StatCard (`ui/StatCard.tsx`)
+**Účel**: Statistická karta pro zobrazení metriky
+```typescript
+{
+  icon: React.ReactNode,
+  label: string,
+  value: string,
+  color?: 'red' | 'green' | 'blue' | 'default'
+}
+```
 
 ## API komunikace
 
 ### API endpoint (`src/lib/api.ts`)
 
-**Base URL**: `http://127.0.0.1:5000/api`
+**Base URL**: Konfigurováno přes environment variable `NEXT_PUBLIC_API_BASE_URL`
 
 #### 1. Health Check
 ```typescript
-GET /health
+GET /api/health
 Response: HealthCheckResponse
 ```
 
 #### 2. Analýza obrázku
 ```typescript
-POST /analyze/image
+POST /api/analyze/image
 Body: FormData (file)
 Response: ImageAnalysisResponse
 ```
 
 #### 3. Analýza videa
 ```typescript
-POST /analyze/video
-Body: FormData (file, max_frames)
+POST /api/analyze/video
+Body: FormData (file, every_n, max_frames)
 Response: VideoAnalysisResponse
 ```
 
-### Utility funkce
+### Utility funkce (`src/lib/utils.ts`)
+
+Formátovací funkce jsou odděleny od API volání:
 
 ```typescript
 // Formátování času
@@ -227,6 +290,10 @@ formatPercentage(value: number): string
 // Úroveň spolehlivosti
 getConfidenceLevel(confidence: number): string
 // Vrací: "Velmi vysoká" | "Vysoká" | "Střední" | "Nízká"
+
+// Barva výsledku
+getResultColor(isFake: boolean): string
+// Vrací: '#ff3366' | '#00ff88'
 ```
 
 ## TypeScript typy
@@ -255,6 +322,17 @@ interface VideoResult {
   duration: number;               // sekundy
 }
 
+interface HealthCheckResponse {
+  status: string;                 // 'healthy'
+  device: string;                 // 'cpu' | 'cuda'
+  threshold: number;              // Práh pro detekci (např. 0.65)
+  models: {
+    ensemble: boolean;            // Zda je ensemble aktivní
+    primary: string;              // Primární model
+    secondary: string[];          // Sekundární modely
+  };
+}
+
 interface KeyFrame {
   frame_index: number;
   visualization: string;          // base64 data URL
@@ -265,6 +343,14 @@ interface Timeline {
   indices: number[];              // Frame čísla
   probabilities: number[];        // Pravděpodobnosti
   timestamps: number[];           // Časy v sekundách
+}
+
+// UI typy
+type StatusType = 'active' | 'inactive';
+
+interface HealthStatus {
+  model: StatusType;
+  system: StatusType;
 }
 ```
 
@@ -308,6 +394,29 @@ interface Timeline {
 - **Progress animace**: 0.5-0.8s easing pro smooth feel
 
 ## State management
+
+### Server-side data (getServerSideProps)
+
+Health check dat jsou načtena na serveru při každém požadavku:
+
+```typescript
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/health`);
+    const data = await response.json();
+    return {
+      props: {
+        health: {
+          model: data.models?.ensemble ? 'active' : 'inactive',
+          system: data.status === 'healthy' ? 'active' : 'inactive',
+        },
+      },
+    };
+  } catch {
+    return { props: { health: { model: 'inactive', system: 'inactive' } } };
+  }
+};
+```
 
 ### Hlavní stav aplikace (index.tsx)
 
@@ -472,11 +581,26 @@ try {
 
 ## Známé limitace
 
-1. **API endpoint hardcoded**: `http://127.0.0.1:5000` - změnit pro production
+1. **API endpoint**: Konfigurováno přes `NEXT_PUBLIC_API_BASE_URL` environment variable
 2. **Bez autentikace**: Otevřený přístup
 3. **File size limity**: Jen klientská validace (backend má vlastní)
 4. **Browser compatibility**: Moderní browsery (ES2020+)
 5. **Mobile UX**: Optimalizováno, ale drag & drop na mobilu limitované
+
+## Principy kódu
+
+### Struktura komponent
+
+- **1 soubor = 1 komponenta**: Každá komponenta má vlastní soubor
+- **Sdílené UI**: Znovupoužitelné komponenty v `components/ui/`
+- **Index soubory**: Pro snadnější importy (`./ui`, `@/components`)
+
+### Oddělení zodpovědností
+
+- **api.ts**: Pouze API volání (fetch funkce)
+- **utils.ts**: Formátovací a pomocné funkce
+- **types/index.ts**: TypeScript definice
+- **components/ui/**: Sdílené UI komponenty
 
 ---
 

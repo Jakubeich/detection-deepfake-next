@@ -1,29 +1,38 @@
-import { useState, useCallback } from 'react';
-import Head from 'next/head';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, RotateCcw, Info } from 'lucide-react';
+import { useState, useCallback } from "react";
+import Head from "next/head";
+import { motion, AnimatePresence } from "framer-motion";
+import { Zap, RotateCcw, Info } from "lucide-react";
+import { GetServerSideProps } from "next";
 
-import Header from '@/components/Header';
-import ModeSelector from '@/components/ModeSelector';
-import FileUpload from '@/components/FileUpload';
-import LoadingAnimation from '@/components/LoadingAnimation';
-import ResultDisplay from '@/components/ResultDisplay';
-import VideoResultDisplay from '@/components/VideoResultDisplay';
+import Header, { HealthStatus } from "@/components/Header";
+import ModeSelector from "@/components/ModeSelector";
+import FileUpload from "@/components/FileUpload";
+import LoadingAnimation from "@/components/LoadingAnimation";
+import ResultDisplay from "@/components/ResultDisplay";
+import VideoResultDisplay from "@/components/VideoResultDisplay";
 
-import { analyzeImage, analyzeVideo } from '@/lib/api';
+import { analyzeImage, analyzeVideo } from "@/lib/api";
 import {
   AnalysisMode,
   AnalysisStatus,
   ImageAnalysisResponse,
-  VideoAnalysisResponse
-} from '@/types';
+  VideoAnalysisResponse,
+} from "@/types";
 
-export default function Home() {
-  const [mode, setMode] = useState<AnalysisMode>('image');
-  const [status, setStatus] = useState<AnalysisStatus>('idle');
+interface HomeProps {
+  health: HealthStatus;
+}
+
+export default function Home({ health }: HomeProps) {
+  const [mode, setMode] = useState<AnalysisMode>("image");
+  const [status, setStatus] = useState<AnalysisStatus>("idle");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imageResult, setImageResult] = useState<ImageAnalysisResponse | null>(null);
-  const [videoResult, setVideoResult] = useState<VideoAnalysisResponse | null>(null);
+  const [imageResult, setImageResult] = useState<ImageAnalysisResponse | null>(
+    null
+  );
+  const [videoResult, setVideoResult] = useState<VideoAnalysisResponse | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = useCallback((file: File) => {
@@ -39,19 +48,19 @@ export default function Home() {
     setError(null);
     setImageResult(null);
     setVideoResult(null);
-    setStatus('idle');
+    setStatus("idle");
   }, []);
 
   const handleAnalyze = useCallback(async () => {
     if (!selectedFile) return;
 
-    setStatus('uploading');
+    setStatus("uploading");
     setError(null);
 
     try {
-      setStatus('analyzing');
+      setStatus("analyzing");
 
-      if (mode === 'image') {
+      if (mode === "image") {
         const result = await analyzeImage(selectedFile);
         setImageResult(result);
       } else {
@@ -59,10 +68,12 @@ export default function Home() {
         setVideoResult(result);
       }
 
-      setStatus('complete');
+      setStatus("complete");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Došlo k neočekávané chybě');
-      setStatus('error');
+      setError(
+        err instanceof Error ? err.message : "Došlo k neočekávané chybě"
+      );
+      setStatus("error");
     }
   }, [selectedFile, mode]);
 
@@ -71,11 +82,11 @@ export default function Home() {
     setImageResult(null);
     setVideoResult(null);
     setError(null);
-    setStatus('idle');
+    setStatus("idle");
   }, []);
 
-  const isAnalyzing = status === 'uploading' || status === 'analyzing';
-  const hasResult = status === 'complete' && (imageResult || videoResult);
+  const isAnalyzing = status === "uploading" || status === "analyzing";
+  const hasResult = status === "complete" && (imageResult || videoResult);
 
   return (
     <>
@@ -84,7 +95,7 @@ export default function Home() {
       </Head>
 
       <main className="min-h-screen">
-        <Header />
+        <Header health={health} />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="mt-8 space-y-10">
@@ -147,7 +158,7 @@ export default function Home() {
                     exit={{ opacity: 0 }}
                   >
                     <LoadingAnimation
-                      stage={status === 'uploading' ? 'uploading' : 'analyzing'}
+                      stage={status === "uploading" ? "uploading" : "analyzing"}
                     />
                   </motion.div>
                 )}
@@ -160,10 +171,10 @@ export default function Home() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {mode === 'image' && imageResult && (
+                    {mode === "image" && imageResult && (
                       <ResultDisplay result={imageResult} />
                     )}
-                    {mode === 'video' && videoResult && (
+                    {mode === "video" && videoResult && (
                       <VideoResultDisplay result={videoResult} />
                     )}
                   </motion.div>
@@ -231,24 +242,29 @@ export default function Home() {
                 <div className="space-y-2">
                   <h4 className="text-neon-blue font-display">Technologie</h4>
                   <p className="break-words">
-                    Aplikace využívá předtrénované modely z Hugging Face (dima806/deepfake_vs_real_image_detection, 
-                    Wvolf/ViT_Deepfake_Detection) s ensemble votingem pro vyšší přesnost.
+                    Aplikace využívá předtrénované modely z Hugging Face
+                    (dima806/deepfake_vs_real_image_detection,
+                    Wvolf/ViT_Deepfake_Detection) s ensemble votingem pro vyšší
+                    přesnost.
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-neon-blue font-display">Jak to funguje</h4>
+                  <h4 className="text-neon-blue font-display">
+                    Jak to funguje
+                  </h4>
                   <p>
-                    Systém detekuje obličeje pomocí MTCNN, analyzuje je pomocí více modelů 
-                    a kombinuje výsledky pro finální predikci.
+                    Systém detekuje obličeje pomocí MTCNN, analyzuje je pomocí
+                    více modelů a kombinuje výsledky pro finální predikci.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h4 className="text-neon-blue font-display">Limitace</h4>
                   <p>
-                    Modely jsou trénované na FaceForensics++ a dalších datasetech. 
-                    Přesnost závisí na kvalitě vstupu a typu deepfake technologie.
+                    Modely jsou trénované na FaceForensics++ a dalších
+                    datasetech. Přesnost závisí na kvalitě vstupu a typu
+                    deepfake technologie.
                   </p>
                 </div>
               </div>
@@ -269,3 +285,29 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  const response = await fetch(`${API_BASE}/api/health`);
+  if (response.ok) {
+    const data = await response.json();
+    return {
+      props: {
+        health: {
+          model: data.models?.ensemble ? "active" : "inactive",
+          system: data.status === "healthy" ? "active" : "inactive",
+        },
+      },
+    };
+  }
+
+  return {
+    props: {
+      health: {
+        model: "inactive",
+        system: "inactive",
+      },
+    },
+  };
+};

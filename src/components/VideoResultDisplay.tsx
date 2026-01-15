@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Shield, ShieldAlert, AlertTriangle, Film, Clock, 
-  BarChart3, Eye, ChevronLeft, ChevronRight, Info 
+import {
+  Shield,
+  ShieldAlert,
+  AlertTriangle,
+  Film,
+  Clock,
+  BarChart3,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Info,
 } from 'lucide-react';
 import { VideoAnalysisResponse } from '@/types';
-import { formatPercentage, formatDuration, getConfidenceLevel } from '@/lib/api';
+import { formatPercentage, formatDuration, getConfidenceLevel } from '@/lib/utils';
+import { ProbabilityBar, StatCard } from './ui';
 
 interface VideoResultDisplayProps {
   result: VideoAnalysisResponse;
@@ -256,85 +265,5 @@ export default function VideoResultDisplay({ result }: VideoResultDisplayProps) 
         </div>
       </motion.div>
     </motion.div>
-  );
-}
-
-interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  color?: 'red' | 'green' | 'blue' | 'default';
-}
-
-function StatCard({ icon, label, value, color = 'default' }: StatCardProps) {
-  const getColorClass = () => {
-    switch(color) {
-      case 'red': return 'text-neon-red';
-      case 'green': return 'text-neon-green';
-      case 'blue': return 'text-neon-blue';
-      default: return 'text-white';
-    }
-  };
-
-  return (
-    <div 
-      className="rounded-lg p-3"
-      style={{ background: 'rgba(18,18,26,0.5)' }}
-    >
-      <div className="flex items-center gap-2 text-gray-400 mb-1">
-        {icon}
-        <span className="text-xs">{label}</span>
-      </div>
-      <span className={`font-display font-bold ${getColorClass()}`}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-interface ProbabilityBarProps {
-  label: string;
-  value: number;
-  color: 'red' | 'green';
-  isHighlighted?: boolean;
-}
-
-function ProbabilityBar({ label, value, color, isHighlighted }: ProbabilityBarProps) {
-  const getBarColor = () => {
-    return color === 'red' ? 'var(--color-neon-red)' : 'var(--color-neon-green)';
-  };
-
-  const getTextClass = () => {
-    if (!isHighlighted) return 'text-gray-400';
-    return color === 'red' ? 'text-neon-red' : 'text-neon-green';
-  };
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-2">
-        <span className={`text-sm ${getTextClass()}`}>
-          {label}
-        </span>
-        <span className={`font-display font-bold ${getTextClass()}`}>
-          {formatPercentage(value)}
-        </span>
-      </div>
-      
-      <div 
-        className="h-3 rounded-full overflow-hidden"
-        style={{ background: 'var(--color-cyber-dark)' }}
-      >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${value * 100}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="h-full rounded-full progress-glow"
-          style={{ 
-            background: getBarColor(),
-            boxShadow: isHighlighted ? `0 0 10px ${getBarColor()}` : 'none'
-          }}
-        />
-      </div>
-    </div>
   );
 }

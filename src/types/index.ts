@@ -61,8 +61,13 @@ export interface VideoAnalysisResponse {
 
 export interface HealthCheckResponse {
   status: string;
-  model_loaded: boolean;
   device: string;
+  threshold: number;
+  models: {
+    ensemble: boolean;
+    primary: string;
+    secondary: string[];
+  };
 }
 
 export type AnalysisMode = 'image' | 'video';
